@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iLumos Patent AI — Architecture & Test Verification Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #111827;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-sky: #06b6d4;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.1));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-primary { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+
+    h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+    .subtitle { color: var(--text-muted); font-size: 16px; max-width: 800px; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+      padding-top: 24px;
+      border-top: 1px solid var(--card-border);
+    }
+    .meta-item label { display: block; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta-item span { font-size: 15px; font-weight: 600; color: #fff; }
+
+    /* Summary Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-number { font-size: 36px; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Architecture Comparison Section */
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 40px;
+    }
+    .section-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+    .diagram-container {
+      margin: 24px 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .diagram-container img { width: 100%; display: block; }
+    .diagram-caption { background: #0d1322; padding: 14px 20px; font-size: 13px; color: var(--text-muted); text-align: center; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th { text-align: left; padding: 14px; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--card-border); color: var(--text-muted); font-weight: 600; }
+    td { padding: 14px; border-bottom: 1px solid var(--card-border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .status-pass { color: #34d399; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+
+    .code-box {
+      font-family: 'JetBrains Mono', monospace;
+      background: #060911;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 12px;
+      color: #7dd3fc;
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+
+    .alert {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 14px;
+      padding: 18px;
+      color: #fcd34d;
+      font-size: 14px;
+      margin-top: 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="badge badge-success">✓ 100% End-to-End Verified</div>
+      <div class="badge badge-primary">Dual-Mode Architecture Enabled</div>
+      <h1>iLumos Patent AI — Architecture & Test Report</h1>
+      <p class="subtitle">Comprehensive test verification, live API integration specs (Google Gemini & OpenAI), rate-limit fallback monitoring, and architectural comparison for Lumenci Hiring Assessment.</p>
+      
+      <div class="meta-grid">
+        <div class="meta-item"><label>Candidate</label><span>Prajwal Skanda</span></div>
+        <div class="meta-item"><label>Product Name</label><span>iLumos (Lumenci Patent AI)</span></div>
+        <div class="meta-item"><label>Target Role</label><span>Senior Product Manager / AI Architect</span></div>
+        <div class="meta-item"><label>Live App</label><span style="color:#60a5fa">prajwalskandas31-sudo.github.io</span></div>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" style="color:#34d399">7 / 7</div>
+        <div class="stat-label">Assessment Scenarios Passed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color:#818cf8">Dual</div>
+        <div class="stat-label">AI Execution Engines</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color:#f59e0b">429</div>
+        <div class="stat-label">Auto-Fallback Rate Monitor</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color:#38bdf8">100%</div>
+        <div class="stat-label">Word Export Precision</div>
+      </div>
+    </div>
+
+    <!-- Architecture 1: Previous Simulation Architecture -->
+    <div class="section">
+      <div class="section-title">
+        <span>🏛️ Architecture 1: Deterministic Simulation Engine (Initial Mode)</span>
+      </div>
+      <p style="color:var(--text-muted); font-size:14px;">The initial baseline architecture designed for zero-dependency assessment grading. Uses a local state machine (`src/App.tsx`) to guarantee deterministic edge case execution without requiring paid API keys or external network connections.</p>
+      
+      <div class="diagram-container">
+        <img src="docs/assets/simulation_architecture_userflow.jpg" alt="Simulation Architecture User Flow Diagram">
+        <div class="diagram-caption">Figure 1.1 — Deterministic Simulation Architecture User Flow Diagram</div>
+      </div>
+    </div>
+
+    <!-- Architecture 2: Live API Integrated Architecture -->
+    <div class="section">
+      <div class="section-title">
+        <span>⚡ Architecture 2: Live API Integrated Architecture with Auto-Fallback (New Edition)</span>
+      </div>
+      <p style="color:var(--text-muted); font-size:14px;">The newly integrated production architecture featuring smart AI Model Routing (Google Gemini 1.5 Flash Free Tier & OpenAI GPT-4o) with a built-in Rate Limit Monitor and graceful auto-fallback.</p>
+
+      <div class="diagram-container">
+        <img src="docs/assets/live_api_architecture_userflow.jpg" alt="Live API Architecture User Flow Diagram">
+        <div class="diagram-caption">Figure 2.1 — Live API Integrated Architecture User Flow Diagram (Dual Mode & 429 Quota Check)</div>
+      </div>
+
+      <div class="alert">
+        <div style="font-size:20px;">⚠️</div>
+        <div>
+          <strong>Free Tier Rate Limit & Quota Exceeded Strategy (HTTP 429 Monitor):</strong>
+          <br>When using free tier APIs (e.g. Google Gemini's 15 requests/minute quota limit), if a rate limit or network error occurs, iLumos immediately displays an amber warning banner and seamlessly transitions to the high-precision legal simulation engine. The analyst experience is never blocked.
+        </div>
+      </div>
+    </div>
+
+    <!-- Verification Test Results Table -->
+    <div class="section">
+      <div class="section-title">🧪 Comprehensive Automated & Manual Test Results</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario #</th>
+            <th>Feature / Edge Case Tested</th>
+            <th>Input Action</th>
+            <th>Expected Behavior</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TC-01</td>
+            <td>Document Ingestion & Setup</td>
+            <td>Upload Claim Chart & TechSpecs</td>
+            <td>Parses 3 claim elements, loads left panel indexed documents</td>
+            <td><span class="status-pass">✓ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>TC-02</td>
+            <td>ML Reasoning Refinement (Elem 3)</td>
+            <td>"Refine element 3 ML evidence"</td>
+            <td>Generates Technical Inference suggestion card with green diff</td>
+            <td><span class="status-pass">✓ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>TC-03</td>
+            <td>Wrong Evidence Correction (Edge Case 1)</td>
+            <td>"Wrong spec: 2.4GHz WiFi not 5GHz"</td>
+            <td>AI acknowledges error and updates quote citation</td>
+            <td><span class="status-pass">✓ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>TC-04</td>
+            <td>Reversibility & Undo (Edge Case 2)</td>
+            <td>Click "Undo Refinement" / type "Undo"</td>
+            <td>Reverts chart from v2.0 to v1.0 instantly</td>
+            <td><span class="status-pass">✓ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>TC-05</td>
+            <td>Missing Evidence Refusal (Edge Case 3)</td>
+            <td>"Check PCB circuit schematics"</td>
+            <td>Refuses hallucination, shows Grounding Notice & Upload button</td>
+            <td><span class="status-pass">✓ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>TC-06</td>
+            <td>Live API Integration & Engine Toggle</td>
+            <td>Select Gemini Free API in Header</td>
+            <td>Executes live API call via REST API with fallback protection</td>
+            <td><span class="status-pass">✓ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>TC-07</td>
+            <td>Legal Word Export (.docx)</td>
+            <td>Click "Export to Word"</td>
+            <td>Downloads formatted Microsoft Word claim chart table</td>
+            <td><span class="status-pass">✓ PASSED</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Technical API Specifications -->
+    <div class="section">
+      <div class="section-title">⚙️ Production REST API Specifications</div>
+      <p style="color:var(--text-muted); font-size:14px; margin-bottom:12px;">Live API request payload format used by `src/services/aiService.ts` for Google Gemini REST Endpoint:</p>
+      
+      <div class="code-box">
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}
+Header: Content-Type: application/json
+
+{
+  "contents": [{
+    "parts": [{
+      "text": "You are iLumos AI. Enforce Phillips Construction Standard...\nReturn JSON schema: { targetElementId, proposedText, groundingType, sources }"
+    }]
+  }]
+}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
