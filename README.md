@@ -11,6 +11,20 @@
 
 **iLumos** is an AI-powered conversational workspace for patent infringement analysis. It enables patent analysts to upload claim charts and supporting product documentation, then conversationally refine claim elements, strengthen evidence, fix weak reasoning, and clarify legal language—all while maintaining 100% human-in-the-loop decision authority and evidence grounding.
 
+
+---
+
+## 🌐 GitHub Repository & Public Deployment
+
+- **GitHub Repository**: [`https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement`](https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement)
+- **Deployment**: Live build generated in `dist/` and ready for instant hosting via GitHub Pages (`npm run deploy`), Vercel (`npx vercel`), or Netlify.
+
+### 1-Command Deployment to GitHub Pages:
+```bash
+# Push latest code to GitHub Pages
+npm run deploy
+```
+
 ---
 
 ## 🚀 Quick Start & Local Execution
