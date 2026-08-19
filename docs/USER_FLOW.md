@@ -2,7 +2,7 @@
 
 **Product**: iLumos (Lumenci AI Patent Refinement Platform)  
 **Author**: Prajwal Skanda  
-**Role Target**: Senior Product Manager / AI Product Architect  
+**Role Target**: Product Manager  
 
 ---
 

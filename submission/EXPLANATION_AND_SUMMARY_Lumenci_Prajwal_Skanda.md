@@ -2,7 +2,7 @@
 
 **Product Name**: iLumos (Lumenci AI Patent Refinement Platform)  
 **Candidate Name**: Prajwal Skanda  
-**Role Target**: Senior Product Manager / AI Product Architect  
+**Role Target**: Product Manager 
 **Assessment**: Lumenci Hiring Assessment  
 **GitHub Repository**: [https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement](https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement)  
 **Live API Repository**: [https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement-Live-API](https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement-Live-API)  

@@ -2,7 +2,7 @@
 
 **Product Name**: iLumos (Lumenci)  
 **Candidate Name**: Prajwal Skanda  
-**Role Target**: Product Manager / AI Product Architect  
+**Role Target**: Product Manager  
 **Version**: 1.0 (MVP Scope)  
 
 ---
