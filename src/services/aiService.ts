@@ -74,8 +74,8 @@ User Refinement Request: "${userQuery}"
 
 Task: Respond ONLY with a valid JSON object matching this schema:
 {
-  "targetElementId": "e3",
-  "elementTitle": "Element 3 (ML Motion Algorithm)",
+  "targetElementId": "elem-3",
+  "elementTitle": "Claim 1[c] (Machine Learning Algorithm)",
   "originalText": "Original Evidence Text",
   "proposedText": "Refined Grounded Evidence Text",
   "reasoning": "Explanation of legal/technical refinement and evidence grounding.",
@@ -109,8 +109,8 @@ Task: Respond ONLY with a valid JSON object matching this schema:
   const parsed = JSON.parse(jsonMatch[0]);
 
   const suggestion: RefinementSuggestion = {
-    targetElementId: parsed.targetElementId || 'e3',
-    elementTitle: parsed.elementTitle || 'Element 3 (ML Motion Algorithm)',
+    targetElementId: parsed.targetElementId || 'elem-3',
+    elementTitle: parsed.elementTitle || 'Claim 1[c] (Machine Learning Algorithm)',
     originalText: parsed.originalText || claimElements[2]?.evidence || '',
     proposedText: parsed.proposedText || 'Refined text via Live Gemini AI',
     reasoning: parsed.reasoning || 'Live AI refinement generated using Google Gemini API.',
@@ -141,8 +141,8 @@ Always output valid JSON only.`;
 User Request: "${userQuery}"
 Return JSON schema:
 {
-  "targetElementId": "e3",
-  "elementTitle": "Element 3",
+  "targetElementId": "elem-3",
+  "elementTitle": "Claim 1[c]",
   "originalText": "...",
   "proposedText": "...",
   "reasoning": "...",
@@ -176,8 +176,8 @@ Return JSON schema:
   const parsed = JSON.parse(data.choices[0].message.content);
 
   const suggestion: RefinementSuggestion = {
-    targetElementId: parsed.targetElementId || 'e3',
-    elementTitle: parsed.elementTitle || 'Element 3',
+    targetElementId: parsed.targetElementId || 'elem-3',
+    elementTitle: parsed.elementTitle || 'Claim 1[c]',
     originalText: parsed.originalText || claimElements[2]?.evidence || '',
     proposedText: parsed.proposedText || 'Refined text via Live OpenAI',
     reasoning: parsed.reasoning || 'Live AI refinement generated using OpenAI API.',
@@ -195,8 +195,8 @@ function getSimulatedSuggestion(userQuery: string, claimElements: ClaimElement[]
   
   if (lower.includes('wrong') || lower.includes('incorrect') || lower.includes('mistake')) {
     return {
-      targetElementId: 'e2',
-      elementTitle: 'Element 2 (Motion Detector)',
+      targetElementId: 'elem-2',
+      elementTitle: 'Claim 1[b] (Motion Detector)',
       originalText: 'Acme Thermostat includes passive infrared (PIR) motion sensor model PIR-200 mapped to Claim Element 2.',
       proposedText: 'Acme Thermostat includes radar-based mmWave motion sensor model RAD-400 (per Rev 3.1 schematic § 2.1), correcting previous PIR-200 reference.',
       reasoning: 'Analyst requested evidence correction. Updated PIR-200 citation to RAD-400 mmWave sensor based on verified Rev 3.1 technical specifications.',
@@ -208,8 +208,8 @@ function getSimulatedSuggestion(userQuery: string, claimElements: ClaimElement[]
   }
 
   return {
-    targetElementId: 'e3',
-    elementTitle: 'Element 3 (Adaptive ML Motion Algorithm)',
+    targetElementId: 'elem-3',
+    elementTitle: 'Claim 1[c] (Machine Learning Algorithm)',
     originalText: 'Marketing Brochure states "Smart Learning occupancy detection automatically adjusts room temperature based on user presence habits."',
     proposedText: 'Firmware binary dumps (fw_v4.2.bin) confirm local execution of a 2-layer decision tree classifier taking PIR raw voltage spikes as input to trigger state transitions without cloud dependency.',
     reasoning: 'Replaced high-level marketing brochure text with grounded technical inference from firmware disassembly, establishing structural equivalence under Phillips Construction Standard.',
