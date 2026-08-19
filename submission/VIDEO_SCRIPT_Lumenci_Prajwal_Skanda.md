@@ -36,6 +36,8 @@
 > 
 > *Notice Element 1[c]—the Machine Learning claim—is flagged with 'Weak Technical Evidence' because public marketing text doesn't disclose algorithm implementation.*
 > 
+> *Notice also in the top navbar, our **AI Engine Selector** allows evaluators to toggle between our deterministic simulation engine, Google Gemini 1.5 Flash (Free Tier), or OpenAI GPT-4o with automatic rate-limit fallback monitoring.*
+> 
 > **[1:10 - 1:45 | Refinement Request & Accept]**  
 > *I’ll click our quick prompt chip: **'The AI reasoning for the ML algorithm element is weak - add more technical details.'***  
 > 

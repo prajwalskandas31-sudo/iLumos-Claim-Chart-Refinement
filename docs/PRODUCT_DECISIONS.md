@@ -52,3 +52,17 @@ Every accepted refinement pushes a snapshot onto an immutable **Version History 
 
 ### Rationale
 - **Exploratory Workspace**: Analysts test multiple legal construction theories. Knowing any path can be rolled back instantly reduces cognitive load and fear of error.
+
+---
+
+## 5. Dual AI Execution Architecture & Rate Limit Fallback Strategy
+
+### Decision
+Implement a **Dual AI Execution Engine**:
+- **Mode 1 (Deterministic Legal Simulation Engine)**: Default execution for offline evaluation and deterministic reviewer testing without requiring API keys or credit card billing.
+- **Mode 2 (Live API Integration Engine)**: Direct REST API integration supporting **Google Gemini 1.5 Flash (Free Tier)** and **OpenAI GPT-4o**.
+- **Rate Limit Monitor (HTTP 429)**: Captures free-tier quota limits (15 RPM) silently, renders an amber alert toast, and automatically falls back to the deterministic legal engine.
+
+### Rationale
+- **Zero-Friction Evaluator Testing**: Ensures Lumenci evaluators can test all 3 edge cases deterministically without needing paid API keys or hitting network rate limits during interviews.
+- **Production Legitimacy**: Demonstrates real production AI capabilities with live Google Gemini and OpenAI REST APIs while protecting analyst workflows against quota disruptions.

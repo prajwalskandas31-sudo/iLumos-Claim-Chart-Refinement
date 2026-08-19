@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD): iLumos AI Claim Chart Refinement
 
 **Product Name**: iLumos (Lumenci)  
-**Author**: Prajwal Skanda  
-**Role Target**: Senior Product Manager / AI Product Architect  
+**Candidate Name**: Prajwal Skanda  
+**Role Target**: Product Manager / AI Product Architect  
 **Version**: 1.0 (MVP Scope)  
 
 ---
@@ -52,6 +52,9 @@ Patent infringement analysis requires mapping patent claim elements against accu
 
 ### Decision 3: Reversible Version Stack with Conversational Undo
 - **Why**: Patent analysis is exploratory. Analysts must feel safe testing experimental reasoning changes knowing every accepted refinement can be undone immediately via chat or history timeline.
+
+### Decision 4: Dual AI Execution Engine & Rate Limit Fallback
+- **Why**: Demonstrates real production capability using **Google Gemini 1.5 Flash (Free Tier)** and **OpenAI GPT-4o** APIs, while offering a deterministic legal simulation mode as default to ensure reviewers can evaluate the prototype reliably without API key dependencies or quota blocks. Implements automatic rate limit (HTTP 429) monitoring to fall back seamlessly without disrupting analyst workflow.
 
 ---
 
