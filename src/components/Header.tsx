@@ -1,6 +1,7 @@
 import React from 'react';
-import { Shield, RotateCcw, FileSpreadsheet, Settings, History, Sparkles, Download } from 'lucide-react';
+import { Shield, RotateCcw, FileSpreadsheet, Settings, History, Sparkles, Download, Cpu } from 'lucide-react';
 import { SystemPromptConfig } from '../types';
+import { ApiSettings } from '../services/aiService';
 
 interface HeaderProps {
   currentVersion: number;
@@ -9,8 +10,10 @@ interface HeaderProps {
   onOpenHistory: () => void;
   onOpenPromptModal: () => void;
   onOpenExportModal: () => void;
+  onOpenApiSettings: () => void;
   onResetSetup: () => void;
   systemPrompt: SystemPromptConfig;
+  apiSettings: ApiSettings;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,8 +23,16 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenHistory,
   onOpenPromptModal,
   onOpenExportModal,
+  onOpenApiSettings,
   onResetSetup,
+  apiSettings,
 }) => {
+  const getEngineLabel = () => {
+    if (apiSettings.provider === 'gemini') return 'Gemini Live AI (Free)';
+    if (apiSettings.provider === 'openai') return 'OpenAI Live';
+    return 'Simulation AI';
+  };
+
   return (
     <header className="app-header">
       <div className="brand-section">
@@ -52,6 +63,16 @@ export const Header: React.FC<HeaderProps> = ({
           <span style={{ fontSize: '11px', color: '#94a3b8', marginLeft: '2px' }}>
             ({totalVersions} saved)
           </span>
+        </button>
+
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={onOpenApiSettings}
+          title="Configure Live Gemini / OpenAI APIs or Simulation Engine"
+          style={{ borderColor: apiSettings.provider !== 'simulation' ? 'rgba(99, 102, 241, 0.4)' : undefined }}
+        >
+          <Cpu size={14} style={{ color: apiSettings.provider !== 'simulation' ? '#818cf8' : '#94a3b8' }} />
+          <span>{getEngineLabel()}</span>
         </button>
       </div>
 

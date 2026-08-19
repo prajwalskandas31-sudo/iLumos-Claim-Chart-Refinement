@@ -9,18 +9,22 @@ import { ChatAssistantPanel } from './components/ChatAssistantPanel';
 import { SystemPromptModal } from './components/SystemPromptModal';
 import { VersionHistoryModal } from './components/VersionHistoryModal';
 import { ExportModal } from './components/ExportModal';
+import { ApiSettingsModal } from './components/ApiSettingsModal';
+import { ApiSettings, DEFAULT_API_SETTINGS, generateAiRefinement } from './services/aiService';
 
 export const App: React.FC = () => {
   // App State
   const [elements, setElements] = useState<ClaimElement[]>(INITIAL_CLAIM_ELEMENTS);
   const [documents, setDocuments] = useState<DocumentFile[]>(MOCK_DOCUMENTS);
   const [systemPrompt, setSystemPrompt] = useState<SystemPromptConfig>(DEFAULT_SYSTEM_PROMPT);
+  const [apiSettings, setApiSettings] = useState<ApiSettings>(DEFAULT_API_SETTINGS);
 
   // Modals & Panels State
   const [isInitialSetupOpen, setIsInitialSetupOpen] = useState<boolean>(true);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState<boolean>(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const [isApiSettingsOpen, setIsApiSettingsOpen] = useState<boolean>(false);
 
   // Selection & Highlight State
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
@@ -164,8 +168,8 @@ export const App: React.FC = () => {
     setMessages(prev => [...prev, rejectMsg]);
   };
 
-  // Main Conversational Simulation Logic
-  const handleSendMessage = (userText: string) => {
+  // Main Conversational Simulation & Live AI API Logic
+  const handleSendMessage = async (userText: string) => {
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
@@ -175,6 +179,25 @@ export const App: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMsg]);
+
+    // IF Live API Mode is selected (Gemini / OpenAI)
+    if (apiSettings.provider !== 'simulation' && apiSettings.apiKey) {
+      const result = await generateAiRefinement(userText, elements, systemPrompt, apiSettings);
+      
+      const aiResponse: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        sender: 'ai',
+        text: result.errorNotice 
+          ? `${result.errorNotice}\n\nGenerated Refinement Proposal:` 
+          : `Generated live claim chart refinement proposal using ${apiSettings.provider === 'gemini' ? 'Google Gemini AI' : 'OpenAI GPT-4o'}:`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        affectedElementId: result.suggestion.targetElementId,
+        suggestion: result.suggestion
+      };
+      setMessages(prev => [...prev, aiResponse]);
+      setSelectedElementId(result.suggestion.targetElementId);
+      return;
+    }
 
     const lower = userText.toLowerCase();
 
@@ -308,8 +331,10 @@ export const App: React.FC = () => {
         onOpenHistory={() => setIsHistoryModalOpen(true)}
         onOpenPromptModal={() => setIsPromptModalOpen(true)}
         onOpenExportModal={() => setIsExportModalOpen(true)}
+        onOpenApiSettings={() => setIsApiSettingsOpen(true)}
         onResetSetup={() => setIsInitialSetupOpen(true)}
         systemPrompt={systemPrompt}
+        apiSettings={apiSettings}
       />
 
       {/* Main 3-Pane Workspace */}
@@ -375,6 +400,13 @@ export const App: React.FC = () => {
         elements={elements}
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
+      />
+
+      <ApiSettingsModal
+        isOpen={isApiSettingsOpen}
+        onClose={() => setIsApiSettingsOpen(false)}
+        settings={apiSettings}
+        onSaveSettings={setApiSettings}
       />
     </div>
   );
