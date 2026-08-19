@@ -58,7 +58,25 @@ Patent infringement analysis requires mapping patent claim elements against accu
 
 ---
 
-## 5. Acceptance Criteria
+## 5. Product & Technical Assumptions
+
+### Operational Assumptions
+1. **Single-Analyst Workflow**: A single patent analyst works on one claim chart at a time during a refinement session. Multi-user concurrent editing is reserved for v2.0.
+2. **Target Audience Expertise**: The analyst is an experienced legal engineer or patent professional. The UI avoids elementary patent tutorials and focuses on high-efficiency legal productivity tools.
+3. **Legal Work Product Target**: The final target artifact is a publication-ready Microsoft Word (`.docx`) claim chart intended for internal legal counsel review or official court filings in patent litigation.
+
+### Technical & Data Assumptions
+1. **Document Grounding Boundary**: The AI operates exclusively on ingested claim charts (`.xlsx`/`.csv`), technical specification PDFs, whitepapers, and user-provided URLs for web scraping.
+2. **Anti-Hallucination Policy**: If requested technical components (e.g., internal PCB circuit schematics) are absent from ingested sources, the AI explicitly declares refusal and prompts the analyst for file upload rather than fabricating engineering details.
+3. **Dual AI Execution Architecture**: 
+   - **Simulation Mode (Default)**: Provides 100% deterministic, zero-dependency testing for assessment reviewers without requiring API keys or incurring credit card costs.
+   - **Live API Integration**: Supports Google Gemini 1.5 Flash (Free Tier) and OpenAI GPT-4o via user-configured REST API keys.
+4. **Rate Limit (HTTP 429) & Auto-Fallback Handling**: Evaluators testing free tier APIs (e.g., Gemini's 15 Requests/Min quota) are protected by a rate limit monitor that displays an amber quota warning and automatically falls back to the deterministic legal engine.
+5. **Authentication & Security Out of Scope**: Enterprise SSO, role-based access control (RBAC), and persistent cloud database storage are excluded from the initial browser prototype scope.
+
+---
+
+## 6. Acceptance Criteria
 1. **Given** an ingested claim chart, **when** an analyst requests ML reasoning refinement, **then** the AI presents a suggestion card highlighting affected Element 1[c], displaying a diff preview, and tagging the inference level.
 2. **Given** a pending suggestion card, **when** the analyst clicks `Apply to Chart`, **then** the chart row updates visually, confidence badge updates, and version counter increments from v1.0 to v2.0.
 3. **Given** a refined claim chart, **when** the analyst types "Undo that refinement", **then** the system restores the exact previous state and confirms the version revert in chat.
@@ -66,7 +84,7 @@ Patent infringement analysis requires mapping patent claim elements against accu
 
 ---
 
-## 6. Success Metrics (Target KPIs)
+## 7. Success Metrics (Target KPIs)
 - **Refinement Acceptance Rate**: Target $\ge 75\%$ of AI suggestions accepted without full rewrite.
 - **Chart Preparation Time**: Target $60\%$ reduction in analyst hours per claim chart (from 8 hrs $\rightarrow$ 3.2 hrs).
 - **Evidence Citation Precision**: $100\%$ of accepted evidence grounded in verified source document page numbers.
