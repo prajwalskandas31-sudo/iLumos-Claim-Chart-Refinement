@@ -4,6 +4,8 @@
 **Candidate Name**: Prajwal Skanda  
 **Role Target**: Senior Product Manager / AI Product Architect  
 **Assessment**: Lumenci Hiring Assessment  
+**GitHub Repository**: [https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement](https://github.com/prajwalskandas31-sudo/iLumos-Claim-Chart-Refinement)  
+**Live Application Link**: [https://prajwalskandas31-sudo.github.io/iLumos-Claim-Chart-Refinement/](https://prajwalskandas31-sudo.github.io/iLumos-Claim-Chart-Refinement/)  
 
 ---
 
