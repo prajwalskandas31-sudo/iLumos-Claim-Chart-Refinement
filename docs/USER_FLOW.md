@@ -16,71 +16,74 @@
 
 ---
 
-## 1. End-to-End User Flow Diagram (Mermaid)
+## 1. End-to-End User Flow Diagram (Mermaid Format)
 
 ```mermaid
 flowchart TD
-    Start([1. Analyst Opens iLumos]) --> Ingest[2. Upload Claim Chart .xlsx]
-    Ingest --> Docs[3. Upload Product Documentation .pdf]
-    Docs --> Config[4. Configure System Prompt & AI Engine]
-    Config --> SelectEngine{4a. Select AI Execution Mode}
+    Start([1. Analyst Opens iLumos Workspace]) --> IngestChart[2. Analyst Uploads 3-Column Claim Chart .xlsx / .csv]
+    IngestChart --> IngestDocs[3. Upload Product Technical Specs .pdf & Whitepapers]
+    IngestDocs --> Config[4. Configure Grounding Rules & AI Engine - Gemini / OpenAI / Simulation]
+    Config --> IndexDocs[5. System Indexes Technical Documents]
+    IndexDocs --> DisplayChart[6. Display 3-Column Working Claim Chart Artifact]
     
-    SelectEngine -- Simulation Mode --> Process[5. Index Documents locally]
-    SelectEngine -- Live Gemini API --> Process
-    SelectEngine -- Live OpenAI API --> Process
+    DisplayChart --> AnalystReview[7. Analyst Identifies Weak or Unverified Evidence]
+    
+    AnalystReview --> PromptInput[8. Analyst Enters Refinement Prompt in Chat\ne.g., 'Strengthen the evidence for element 2']
+    
+    PromptInput --> QuotaCheck{8a. API Quota Check}
+    QuotaCheck -- Success --> AIProcessing[9. AI Searches Vector Context & Technical Docs]
+    QuotaCheck -- HTTP 429 Quota Exceeded --> FallbackToast[Display Amber Rate Limit Warning]
+    FallbackToast --> SimulationEngine[Auto-Fallback to Legal Simulation Engine]
+    SimulationEngine --> AIProcessing
 
-    Process --> Display[6. Display 3-Column Working Claim Chart]
-    Display --> Review[7. Analyst Reviews Initial Claim Chart]
+    AIProcessing --> AISuggestionCard[10. AI Responds with Grounded Suggestion Card in Chat\nShows Diff Preview, Citations & Grounding Badge]
     
-    Review --> ChatInput[8. Analyst Enters Refinement Request in Chat]
-    ChatInput --> EngineCheck{8a. API Quota Check}
+    AISuggestionCard --> AnalystAction{11. Analyst Reviews Suggestion in Chat}
+    
+    AnalystAction -- Accept --> ApplyChange[12. Update Center Claim Chart Row + Green Diff Highlights]
+    ApplyChange --> VersionIncrement[13. Save Snapshot v+1 to Reversible Version Stack]
+    VersionIncrement --> CheckComplete{14. More Refinements Needed?}
+    
+    AnalystAction -- Reject --> RetainOriginal[Keep Original Chart Row Unchanged]
+    RetainOriginal --> CheckComplete
+    
+    AnalystAction -- Modify --> ChatFollowUp[15. Conversational Follow-up in Chat]
+    ChatFollowUp --> PromptInput
 
-    EngineCheck -- Success --> AIAnalysis[9. AI Analyzes Request against Evidence Context]
-    EngineCheck -- 429 Rate Limit Exceeded --> FallbackNotice[Display Amber Rate Limit Warning Toast]
-    FallbackNotice --> SimulationFallback[Auto-Fallback to Legal Simulation Engine]
-    SimulationFallback --> AIAnalysis
+    CheckComplete -- Yes --> AnalystReview
+    CheckComplete -- No --> ExportDocx([16. Export Final Refined Claim Chart to Word .docx])
 
-    AIAnalysis --> AISuggestion[10. AI Responds with Grounded Suggestion Card]
-    AISuggestion --> Indicate[11. AI Indicates Affected Element & Grounding Level]
-    
-    Indicate --> AnalystReview[12. Analyst Reviews Suggestion Card]
-    
-    AnalystReview --> Choice{13. Analyst Action}
-    
-    Choice -- Accept --> AcceptBranch[14. Analyst Accepts Suggestion]
-    AcceptBranch --> UpdateChart[15. Update Claim Chart Row + Highlight Diff]
-    UpdateChart --> IncrementVersion[16. Save New Version v+1 in Timeline]
-    IncrementVersion --> Iterate[17. Analyst Continues Iterating]
-    
-    Choice -- Reject --> RejectBranch[Keep Original Chart Unchanged]
-    RejectBranch --> Iterate
-    
-    Choice -- Modify --> ModifyBranch[Conversational Follow-up in Chat]
-    ModifyBranch --> ChatInput
-
-    Iterate --> Export([18. Analyst Exports Final Claim Chart to Word .docx])
-
-    %% EDGE CASE BRANCHES
-    subgraph Edge_Cases [Key Exceptional Workflows]
+    %% ----------------------------------------------------
+    %% SUBGRAPH: KEY EXCEPTIONAL WORKFLOWS (3 REQUIRED EDGE CASES)
+    %% ----------------------------------------------------
+    subgraph EdgeCases [3 Key Exceptional Workflows / Edge Cases]
         direction TB
         
-        %% Edge Case 1: Wrong Evidence
-        WrongEvidence[Edge Case 1: Wrong Evidence] --> EC1_Flag[Analyst Flags Incorrect Citation in Chat]
-        EC1_Flag --> EC1_AI[AI Re-analyzes Source & Admits Correction]
-        EC1_AI --> EC1_Update[AI Outputs Corrected Citation Card]
-        EC1_Update --> Choice
-        
-        %% Edge Case 2: Reversibility & Undo
-        Reversibility[Edge Case 2: Reversibility] --> EC2_Undo[Analyst Clicks 'Undo Refinement' or Types 'Undo']
-        EC2_Undo --> EC2_Stack[Revert Claim Chart State from v2.0 to v1.0]
-        EC2_Stack --> EC2_Notice[Display AI Reversion Message in Chat]
-        
+        %% Edge Case 1: Wrong Evidence Correction
+        subgraph EC1 [Edge Case 1: AI Gives Wrong Evidence]
+            WrongQuote[1. AI Cites Incorrect Specification Parameter\ne.g., 5GHz WiFi instead of 2.4GHz] --> AnalystFlag[2. Analyst Corrects via Chat:\n'That citation is incorrect—the spec sheet specifies 2.4GHz']
+            AnalystFlag --> AIReanalyze[3. AI Re-analyzes Ingested Technical Specs]
+            AIReanalyze --> AICorrectedCard[4. AI Admits Error in Chat & Outputs Corrected Citation Card]
+            AICorrectedCard --> AnalystAction
+        end
+
+        %% Edge Case 2: User Wants to Undo
+        subgraph EC2 [Edge Case 2: User Wants to Undo Refinement]
+            UndoTrigger[1. Analyst Wants to Revert Accepted Refinement] --> UndoPrompt[2. Analyst Types 'Undo that refinement' or Clicks Undo]
+            UndoPrompt --> RevertStack[3. System Reverts Claim Chart State from v2.0 back to v1.0]
+            RevertStack --> ConfirmMessage[4. AI Confirms Restored Workspace State in Chat]
+            ConfirmMessage --> DisplayChart
+        end
+
         %% Edge Case 3: Missing Evidence Handling
-        MissingEvidence[Edge Case 3: Missing Evidence] --> EC3_Query[Analyst Requests Refinement on Missing Schematic]
-        EC3_Query --> EC3_Refusal[AI Checks Vector Context & Refuses Hallucination]
-        EC3_Refusal --> EC3_Notice[Display Grounding Notice & Highlight Upload Button]
-        EC3_Notice --> EC3_Upload[Analyst Uploads Missing Document/URL]
-        EC3_Upload --> Process
+        subgraph EC3 [Edge Case 3: AI Cannot Find Evidence]
+            MissingQuery[1. Analyst Requests Refinement for Undocumented Component\ne.g., Internal PCB Circuit Schematics] --> AICheckContext[2. AI Searches Context - No Match Found]
+            AICheckContext --> AIRefuseHallucination[3. AI Refuses to Hallucinate Engineering Details]
+            AIRefuseHallucination --> PromptUpload[4. AI Asks Analyst for Guidance in Chat:\n'Upload Technical Documentation or Supply URL for Web Scraping']
+            PromptUpload --> AnalystSupplies[5. Analyst Uploads Missing PDF or Provides Spec URL]
+            AnalystSupplies --> IndexNewSource[6. System Indexes New Source Context]
+            IndexNewSource --> AIProcessing
+        end
     end
 ```
 
@@ -102,10 +105,10 @@ flowchart TD
    - *Center Pane*: Active 3-column claim chart with row status badges (*Original*, *Weak Evidence*, *Modified*, *Verified*).
    - *Right Pane*: Conversational AI Assistant & Suggestion Cards.
 7. **Initial Analyst Review**: Analyst identifies weak evidence in Claim 1[c] (Machine Learning algorithm relying on vague marketing brochure text).
-8. **Conversational Refinement Request**: Analyst enters prompt: *"Refine element 3 to distinguish public Auto-Schedule claims from proprietary source code details."*
-9. **AI Analysis & Grounding Search**: System searches indexed documents for algorithm specifications.
+8. **Conversational Refinement Request**: Analyst enters prompt: *"Strengthen the evidence for element 2"*.
+9. **AI Analysis & Grounding Search**: System searches indexed documents for hardware specifications.
 10. **Structured Suggestion Card Generation**: AI responds with a structured card featuring green diff previews and explicit action buttons (`Apply`, `Reject`, `Modify`).
-11. **Grounding Badge Assignment**: AI tags the proposal with a **Technical Inference** or **Direct Evidence** badge and lists exact document page citations.
+11. **Grounding Badge Assignment**: AI tags the proposal with a **Direct Evidence** or **Technical Inference** badge and lists exact document page citations.
 12. **Human-in-the-Loop Review**: Analyst reviews diff preview before applying changes.
 13. **Analyst Action Decision**:
     - **Accept**: Applies changes to the chart.
@@ -118,10 +121,16 @@ flowchart TD
 
 ---
 
-## 3. Rate Limit (HTTP 429) & Auto-Fallback Strategy
+## 3. Detailed Edge Case Analysis (3 Required Workflows)
 
-When evaluators test the live Google Gemini API (Free Tier):
-- **Quota Limit**: 15 Requests/Min (RPM).
-- **Auto-Monitoring**: If an API call receives a `429 Too Many Requests` or `RESOURCE_EXHAUSTED` status code, iLumos captures the error silently.
-- **Amber Warning Toast**: Renders an alert toast explaining that the free quota limit was reached.
-- **Seamless Engine Fallback**: Switches execution to the legal simulation engine so the analyst's workflow is never interrupted or blocked.
+### Edge Case 1: AI Gives Wrong Evidence (Analyst Corrects via Chat)
+- **Scenario**: AI attributes dual-band 5GHz WiFi support to the Acme Thermostat when technical documentation specifies 2.4GHz 802.11 b/g/n only.
+- **Handling**: Analyst states in chat: *"That citation is incorrect. The spec sheet specifies 2.4GHz WiFi."* AI re-reads `Acme_Thermostat_v3_TechSpecs.pdf`, admits the mistake in chat, and presents an updated citation card with corrected page references. The analyst remains the final reviewer.
+
+### Edge Case 2: User Wants to Undo a Previous Refinement
+- **Scenario**: Analyst wants to revert an accepted refinement on Claim 1[c] back to the initial state.
+- **Handling**: Analyst types *"Undo that refinement"* in chat or clicks the **Undo** button in the top navbar. The system pops the latest snapshot from the version stack, restores the claim chart to state $v1.0$, and sends a confirmation message in chat.
+
+### Edge Case 3: AI Cannot Find Evidence (Asks Analyst to Upload Docs / URL)
+- **Scenario**: Analyst asks for internal PCB circuit schematics or dual-band antenna trace diagrams.
+- **Handling**: The AI refuses to hallucinate or invent engineering details. The AI presents a **Grounding Notice** card stating that evidence is missing from current context and asks the analyst in chat: *"Upload Technical Documentation or Supply URL for Web Scraping"*, providing direct interactive buttons for file drop or URL entry.
